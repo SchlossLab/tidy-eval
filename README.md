@@ -258,6 +258,22 @@ iris %>% summarize_vars(Sepal.Length, Sepal.Width, Petal.Width)
     ## 2 versicolor         5.94        2.77       1.33 
     ## 3 virginica          6.59        2.97       2.03
 
+``` r
+summarize_vars <- function(.data, ...) {
+  .data %>% 
+    group_by(...) %>%
+    summarize_at(vars(-group_cols()), mean)
+}
+iris %>% summarize_vars(Species)
+```
+
+    ## # A tibble: 3 x 5
+    ##   Species    Sepal.Length Sepal.Width Petal.Length Petal.Width
+    ##   <fct>             <dbl>       <dbl>        <dbl>       <dbl>
+    ## 1 setosa             5.01        3.43         1.46       0.246
+    ## 2 versicolor         5.94        2.77         4.26       1.33 
+    ## 3 virginica          6.59        2.97         5.55       2.03
+
 Note:
 
   - You don’t need to use `!!enquo` or `{{ }}` when using `...` – it

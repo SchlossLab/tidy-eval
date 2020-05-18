@@ -183,6 +183,15 @@ summarize_vars <- function(.data, ...) {
 iris %>% summarize_vars(Sepal.Length, Sepal.Width, Petal.Width)
 ```
 
+```{r}
+summarize_vars <- function(.data, ...) {
+  .data %>% 
+    group_by(...) %>%
+    summarize_at(vars(-group_cols()), mean)
+}
+iris %>% summarize_vars(Species)
+```
+
 Note:
 
 - You don't need to use `!!enquo` or `{{ }}` when using `...` -- it just works!
