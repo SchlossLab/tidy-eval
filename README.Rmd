@@ -180,12 +180,12 @@ Note that `...` has to be the last argument in the function signature.
 ```{r}
 # replace the X's to make this code work
 calc_ratio <- function(data, var1, var2) {
-    XXXXXX %>% 
-        mutate(ratio = XXXXXXX / XXXXXXX)
+    data %>% 
+        mutate(ratio = {{ var1 }} / {{ var2 }})
 }
 # example:
-#iris %>% calc_ratio(Sepal.Length, Sepal.Width)
-#iris %>% calc_ratio(Petal.Width, Petal.Length)
+iris %>% calc_ratio(Sepal.Length, Sepal.Width)
+iris %>% calc_ratio(Petal.Width, Petal.Length)
 ```
 
 ### 2. Write a function to create a histogram that can use any column for `x`
@@ -200,7 +200,9 @@ iris %>%
 Create a function that takes a column to use for `x`:
 ```{r hist_exercise}
 plot_hist <- function(data, x_col) {
-    # write code here
+    data %>% 
+        ggplot(aes(x = {{ x_col }}, fill = Species)) +
+        geom_histogram()
 }
 plot_hist(iris, Sepal.Width)
 plot_hist(iris, Petal.Length)
@@ -209,11 +211,14 @@ plot_hist(iris, Petal.Length)
 ### 3. Write a function to create a boxplot with any aesthetics
 
 ```{r boxplots}
-# write function here
-
+plot_box <- function(data, ...) {
+    data %>% 
+        ggplot(aes(...)) +
+        geom_boxplot()
+}
 # example:
-#iris %>% plot_box(x = Species, y = Petal.Width, fill = Species)
-#iris %>% plot_box(x = Species, y = Sepal.Length, color = Species)
+iris %>% plot_box(x = Species, y = Petal.Width, fill = Species)
+iris %>% plot_box(x = Species, y = Sepal.Length, color = Species)
 ```
 
 ### 4. Bonus: Write a function that names a new column based on the variable
@@ -222,10 +227,10 @@ How strong is your Google-foo?
 ```{r}
 calc_mean <- function(data, var) {
     data %>% 
-        summarize(XXXXXXXXX= mean({{ var }}))
+        summarize("mean_{{var}}" := mean({{ var }}))
 }
 # example:
-#iris %>% calc_mean(Sepal.Length)
+iris %>% calc_mean(Sepal.Length)
 #>   mean_Sepal.Length
 #> 1          5.843333
 ```
