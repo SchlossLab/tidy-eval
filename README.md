@@ -180,9 +180,31 @@ iris %>%
     ## 2 versicolor    50   4.9   7  
     ## 3 virginica     50   4.9   7.9
 
-This pattern of using `enquo` followed soon after by `!!` is really
-common, so the tidyverse developers created a new operator called
-embracing `{{ }}` to do them both at the same time:
+If you don’t need to do anything with the `quosure` before unquoting it,
+you can use `!!enquo` all at once like this:
+
+``` r
+var_summary <- function(data, var) {
+    data  %>%
+        group_by(Species) %>%
+        summarize(n = n(),
+                  min = min(!!enquo(var)),
+                  max = max(!!enquo(var)))
+}
+iris %>%
+    var_summary(Sepal.Length)
+```
+
+    ## # A tibble: 3 x 4
+    ##   Species        n   min   max
+    ##   <fct>      <int> <dbl> <dbl>
+    ## 1 setosa        50   4.3   5.8
+    ## 2 versicolor    50   4.9   7  
+    ## 3 virginica     50   4.9   7.9
+
+This pattern of using `!!enquo` is really common, so the tidyverse
+developers created a new operator called embracing `{{ }}` to do them
+both at the same time:
 
 ``` r
 var_summary <- function(data, var) {
@@ -218,26 +240,34 @@ iris %>% filter2(Sepal.Length > Sepal.Width * 2.5, Species == "versicolor")
 
 ### Example: multiple arguments
 
-You can pass any number of arguments to other functions with `...`.
+You can pass any number of arguments to other functions with `...`
 
 ``` r
-summarize_vars <- function(data, ...) {
-  data %>% 
+summarize_vars <- function(.data, ...) {
+  .data %>% 
     group_by(Species) %>%
     summarize_at(vars(...), mean)
 }
-iris %>% summarize_vars(Sepal.Length, Sepal.Width)
+iris %>% summarize_vars(Sepal.Length, Sepal.Width, Petal.Width)
 ```
 
-    ## # A tibble: 3 x 3
-    ##   Species    Sepal.Length Sepal.Width
-    ##   <fct>             <dbl>       <dbl>
-    ## 1 setosa             5.01        3.43
-    ## 2 versicolor         5.94        2.77
-    ## 3 virginica          6.59        2.97
+    ## # A tibble: 3 x 4
+    ##   Species    Sepal.Length Sepal.Width Petal.Width
+    ##   <fct>             <dbl>       <dbl>       <dbl>
+    ## 1 setosa             5.01        3.43       0.246
+    ## 2 versicolor         5.94        2.77       1.33 
+    ## 3 virginica          6.59        2.97       2.03
 
-You don’t need to use `!!enquo` or `{{ }}` when using `...`. Note that
-`...` has to be the last argument in the function signature.
+Note:
+
+  - You don’t need to use `!!enquo` or `{{ }}` when using `...` – it
+    just works\!
+  - The triple-dots `...` has to be the last argument in the function
+    signature.
+  - It’s considered good practice to name your other arguments beginning
+    with a `.` so users don’t accidentally match them to other variables
+    forwarded by `...` ([more details
+    here](https://design.tidyverse.org/dots-prefix.html)).
 
 ## Exercises
 
@@ -312,7 +342,7 @@ calc_mean <- function(data, var) {
 
 ## Resources
 
-  - Vignette on tidy eval with dplyr:
+  - Vignette on tidy eval with dplyr (this document adapts parts of it):
     <https://dplyr.tidyverse.org/dev/articles/programming.html>
   - Section on tidy eval in The Tidynomicon:
     <http://tidynomicon.tech/nse.html#what-is-tidy-evaluation>
