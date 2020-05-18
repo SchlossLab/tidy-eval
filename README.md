@@ -21,8 +21,7 @@ numbers <- 1:3
 ls()
 ```
 
-    ## [1] "calc_mean"      "calc_ratio"     "filter2"        "name"           "numbers"       
-    ## [6] "plot_hist"      "summarize_vars" "var_summary"
+    ## [1] "name"    "numbers"
 
 Besides variables that you create, some packages include datasets that
 are also available as `env-variables`. `iris` is a dataframe that’s
